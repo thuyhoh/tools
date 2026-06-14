@@ -11,6 +11,15 @@
     - Commit: cập nhật sự thay đổi lên Local Repository
     - merge: gộp các Branch lại
 
+### Setup github trong ubuntu
+- install gh package
+```
+sudo apt install gh
+```
+- login github thông qua https/ssh
+```
+gh auth login
+```
 ## II. Git
 ### 1. Lệnh trong Git
 #### 1. Thiết lập chứng thực cá nhân
