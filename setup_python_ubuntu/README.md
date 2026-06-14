@@ -14,7 +14,8 @@ source ~/venvs/bin/activate
 => khi này có thể tải, sử dụng python3 mà không ảnh hưởng đến python chính của ubuntu
 <br>
 - Thoát khỏi chế độ venvs
-``` sh
+
+```
 deactivate
 ```
 
