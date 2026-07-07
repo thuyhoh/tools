@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.29.3)
+
+include(CMakePrintHelpers)
+include(Src_Include.cmake)
+
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/GCC.cmake)
+
+# teen du an
+project(ThoNV_Project)
+
+set(EXECUTABLE ${PROJECT_NAME}.elf)
+
+==========================================
+enable_language(C ASM)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSION OFF)
+==========================================
+
+message(STATUS "CMAKE_TOOLCHAIN_FILE is: ${CMAKE_TOOLCHAIN_FILE}")
+cmake_print_variables()#
+
+target_compile_options(${EXCUTABLE} PRIVATE
+	-c
+	-mcpu=cortex-m4
+	-mthumb
+	-mlittle-endan
+	-O0
+	-g
+	-fstack-usage
+)
+target_link_options(${EXCUTABLE} PRIVATE
+	-Wl, -Map=${PROJECT_NAME}.map, cref
+	--entry=Reset_Handler
+	-specs-nano.specs
+	-specs=nosys.specs
+	-mcpu=cortex-m4
+	-mlittle-endian
+	-nostdlib
+	# -Xlinker -print-memory-usage -Xlinker
+	-n 
+	-T
+	${LINKER_FILE}
+)
+
+add_custom_command(TARGET ${EXCUTABLE} POST_BUILD
+	COMMAND ${CMAKE_SIZE_UTIL} $<TARGET_FILE:${EXECUTABLE}>)
+
+add_custom_command(TARGET ${EXCUTABLE} POST_BUILD
+	COMMAND ${CMAKE_OBJCOPY} -O srec --srec-len=64 ${EXECUTABLE} ${PROJECT_NAME}.s19
+	COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${EXECUTABLE}> ${PROJECT_NAME}.hex
+	COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${EXECUTABLE}> ${PROJECT_NAME}.bin)
+
