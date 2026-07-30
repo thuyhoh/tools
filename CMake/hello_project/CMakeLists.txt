@@ -7,7 +7,10 @@ set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/GCC.cmake)
 target_include_directories(HelloWorld PRIVATE include)
 
 # Khai báo dự án
-project(HelloWorld C)
+project(HelloWorld 
+    VERSION 1.0
+    DESCRIPTION "Hello World Project"
+    LANGUAGES C )
 
 ## 
 add_executable(hello main.c)

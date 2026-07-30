@@ -29,15 +29,8 @@ my_project/
 └── docs/               # Tài liệu (optional)
 ```
 
-## Cấu trúc CMakeLists.txt 
-### Version CMake tối thiểu
-```
-cmake_minimum_required(VERSION 3.10)
-```
-### Project infor
 
-# 3. Variables / options
-### Khởi tạo project
+
 
 ## Build project
 ### Build project từ folder ./build
@@ -60,7 +53,7 @@ thuy@thuy-ASUS:~/embedded/tools/CMake/hello_project/build$ cmake --build .
 [ 50%] Building C object CMakeFiles/hello.dir/main.c.obj
 [100%] Linking C executable 
 ```
-
+### Build project từ folder chính
 ```
 thuy@thuy-ASUS:~/embedded/tools/CMake/hello_project$ cmake -B ./build/
 -- The C compiler identification is GNU 13.3.0
@@ -74,78 +67,131 @@ thuy@thuy-ASUS:~/embedded/tools/CMake/hello_project$ cmake -B ./build/
 -- Build files have been written to: /home/thuy/embedded/tools/CMake/hello_project/build
 ```
 
-
-## Variable
-- Trong CMake có 3 loại biến:
-    - Normal variable
-    - Cache variable
-    - enviroment variable
+## 
+### Khai báo dự án
+- Khai báo version CMake tối thiểu
+```cmake
+cmake_minimum_required(VERSION 3.10)
+``` 
+- khai báo thông tin dự án
 ``` cmake
-# Gán giá trị cho biến
-set(PROJECT_NAME hello) # PROJECT_NAME → "hello"
-set(SRC main.c utils.c) # SRC → "main.c utils.c"
-
-# Sử dụng biến 
-${VARIABLE_NAME}
+project(myproj 
+    VERSION 1.0
+    DESCRIPTION "Hello World Project"
+    LANGUAGES C )
 ```
-### Normal variable
-- Chỉsống trong scope hiện tại.
-### Cache variable
-- Lưu trong CMakeCache.txt, tồn tại qua nhiều lần build.
-```
-set(BOARD stm32 CACHE STRING "Target board")
-```
-=> kiểm tra 
-### Environment variable
-- Lấy từ shell/Linux environment.
-``` sh
-# linux shell
-export TOOLCHAIN=/opt/gcc-arm
-
-# cmake 
-$ENV{TOOLCHAIN}
-```
-### Một số biến thường sử dụng 
-- CMAKE_SOURCE_DIR
-- CMAKE_CURRENT_SOURCE_DIR
-
-
-
-## Hiển thị biến 
-- Sử dụng message
-``` CMake
-message("Hello")
-message(STATUS "Hello STATUS")
-message(DEBUG "Hello DEBUG")
-message(WARNING "Hello WARNING")
-message(FATAL ERROR "Hello ERROR")
-```
-- sử dụng thư viện CMakePrintHelpers
-```
-include (CMakePrintHelpers)
-cmake_print_variables(variable)
-```
-
-
-## GLOB và GLOB_RECURSE
-- GLOB dùng để lấy danh sách file theo pattern.
-```
-file(GLOB SRC_FILES src/*.c) # gán toàn bộ file .c trong folder src/ cho biến SRC_FILES
-
-# => kết quả
-SRC_FILES =
-    src/main.c
-    src/uart.c
-    src/spi.c 
-```
-- GLOB_RECURSE giống với GLOB nhưng quét toàn bộ đệ quy tất cả subfolder
-
-## target_include_directories
-- Dùng để nói với compiler Header files của target nằm ở đâu.
+</br>=> Sau khi khai báo, CMake tạo ra các biến
 ``` cmake
-target_include_directories(target scope dir1 dir2 ...)
+PROJECT_NAME
+PROJECT_VERSION
+PROJECT_SOURCE_DIR
+PROJECT_BINARY_DIR
 ```
-### scope: PRIVATE / PUBLIC / INTERFACE
+
+### Biến trong CMake
+- Gán giá trị cho biến
+```cmake
+set(VAR_NAME "Hello")
+```
+- Truy cập biến
+```cmake
+${VAR_NAME}
+```
+- Xóa biến
+```
+unset(VAR_NAME)
+```
+### List
+- danh sách được lưu dưới dạng các phần tử ngăn cách bằng dấu ``;``
+```
+set(SRC
+    main.cpp
+    foo.cpp
+    bar.cpp
+)
+=> SRC = main.cpp;foo.cpp;bar.cpp
+```
+- Thêm phần tử cho list
+```
+list(APPEND SRC test.cpp)
+
+=> SRC = main.cpp;foo.cpp;bar.cpp;test.cpp
+```
+- lấy phần tử
+``` cmake
+list(GET SRC 0 FIRST) # main.cpp
+message(${FIRST})
+```
+### include file CMake
+```cmake
+include(cmake/Utils.cmake)
+```
+### Hiển thị log
+```
+message(STATUS "")
+message(WARNING "")
+message(FATAL_ERROR "")
+```
+
+### Tạo file thực thi 
+```cmake
+add_executable(MyApp
+    main.cpp
+    foo.cpp
+)
+```
+</br>=> Sau khi build tạo ra MyApp.exe/MyApp
+
+
+### Tạo thư viện
+``` cmake
+add_library(led STATIC
+    led.c
+    rgb_led.c
+    ws2812.c
+)
+```
+</br> => tạo ra file libled.a
+```
+libled.a
+├── led.o
+├── rgb_led.o
+└── ws2812.o
+```
+
+### Liên kết thư viện
+```
+target_link_libraries(led)
+```
+
+
+### thêm một thư mục con vào quá trình build.
+```
+Project/
+│
+├── CMakeLists.txt
+│
+├── BSP/
+│   └── led/
+│       ├── CMakeLists.txt
+│       ├── led.c
+│       └── led.h
+│
+└── App/
+    ├── CMakeLists.txt
+    └── app.c
+```
+```cmake 
+# ~/CMakeLists.txt
+add_subdirectory(BSP/led)
+```
+<br> => Khi gặp lệnh add_subirectory()
+- Đi vào thư mục BSP/led.
+- Tìm file BSP/led/CMakeLists.txt.
+- Thực thi toàn bộ nội dung của file đó.
+- Quay lại file Project/CMakeLists.txt và tiếp tục dòng tiếp theo.
+
+
 
 
 
